@@ -1,5 +1,6 @@
 '''Model classes'''
 from abc import ABC, abstractmethod
+from math import sqrt
 import random
 
 
@@ -56,3 +57,62 @@ class Sheep(Animal):
                             lambda pos: self.move((0, -self.move_dist))]
 
         random.choice(direction_selector)(self.pos)
+
+
+class Wolf(Animal):
+    '''
+    Class representing simulated wolf
+
+    Args:
+        move_dist (float): maximum distance by which the wolf can move
+
+    Attributes:
+        move_dist (float): used to store move_dist arg
+        pos (list): represents position of the Wolf on cartesian plane
+        prey (Sheep): Sheep the wolf is currently chasing
+        killed_this_round (Sheep): The Sheep which was killed by the Wolf in last iteration
+    '''
+    def __init__(self, move_dist):
+        super().__init__(move_dist)
+        self.pos = [0, 0]
+        self.prey = None
+        self.killed_this_round = None
+
+    def chase(self, flock: list):
+        '''
+        Finds the closes Sheep in given flock of Sheep,
+        moves the Wolf towards it by up to its move_dist,
+        if a Sheep is within its move_dist, sets the Sheeps alive variable to False.
+        '''
+        self.prey = flock[0]
+        for sheep in flock:
+            if calculate_distance(self, sheep) < calculate_distance(self, self.prey):
+                self.prey = sheep
+
+        distance = calculate_distance(self, self.prey)
+        vector = calculate_vector(self, self.prey)
+        if distance <= self.move_dist:
+            self.move(vector)
+            self.prey.alive = False
+            self.prey.pos = None
+            self.killed_this_round = self.prey
+            self.prey = None
+        else:
+            self.killed_this_round = None
+            vector[0] = vector[0]/distance
+            vector[1] = vector[1]/distance
+
+            vector[0] = vector[0] * self.move_dist
+            vector[1] = vector[1] * self.move_dist
+            self.move(vector)
+
+
+def calculate_distance(animal_a: Animal , animal_b: Animal):
+    '''Returns distance between animal_a and animal_b'''
+    vector = calculate_vector(animal_a, animal_b)
+    return sqrt(vector[0]**2 + vector[1]**2)
+
+
+def calculate_vector(animal_a: Animal , animal_b: Animal):
+    '''Returns a list representing a vector from animal_a to animal_b'''
+    return [animal_b.pos[0] - animal_a.pos[0], animal_b.pos[1] - animal_a.pos[1]]
