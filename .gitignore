@@ -130,5 +130,5 @@ dmypy.json
 
 
 #project specific
-files/alive.csv
-files/pos.json
+alive.csv
+pos.json

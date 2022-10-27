@@ -10,6 +10,8 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('-c', '--config', help='auxiliary configuration file', metavar='FILE',
                     default='config.cnf')
+parser.add_argument('-d', '--dir', help='subdirectory where report files will be placed',
+                    default='.')
 parser.add_argument('-r', '--rounds', help='numer of rounds', metavar='NUM',
                     type=IntRange(1), default=20)
 parser.add_argument('-s', '--sheep', help='numer of sheep in flock', metavar='NUM',
@@ -21,7 +23,6 @@ args = parser.parse_args()
 config = configparser.ConfigParser()
 if config.read(args.config) is None:
     raise argparse.ArgumentTypeError(f'{args.config} is not a config file')
-
 
 config.read(args.config)
 WAIT = args.wait
@@ -44,8 +45,8 @@ def start_simulation():
             wolf.chase(alive_sheep)
 
             display_info(flock, wolf, round_number)
-            save_to_json(flock, wolf, round_number)
-            save_to_csv(flock, round_number)
+            save_to_json(flock, wolf, round_number, args.dir)
+            save_to_csv(flock, round_number, args.dir)
 
             if WAIT:
                 input()

@@ -1,6 +1,6 @@
 import csv
 import json
-from os import remove, path
+from os import remove, mkdir, path
 
 
 def display_info(flock, wolf, round_number):
@@ -22,9 +22,12 @@ def display_info(flock, wolf, round_number):
             + f'{len([sheep for sheep in flock if sheep.alive])} sheep left alive\n')
 
 
-def save_to_json(flock, wolf, round_number):
+def save_to_json(flock, wolf, round_number, directory):
     '''Saves information about animal positions to pos.json file'''
-    file_path = 'files/pos.json'
+    if not path.exists(directory):
+        mkdir(directory)
+
+    file_path = f'{directory}/pos.json'
     if (round_number == 0) and (path.exists(file_path)):
         remove(file_path)
 
@@ -35,9 +38,12 @@ def save_to_json(flock, wolf, round_number):
                     'sheep_pos': sheep_pos_list}, indent=4))
 
 
-def save_to_csv(flock, round_number):
+def save_to_csv(flock, round_number, directory):
     '''Saves information about alive sheep to alive.csv file'''
-    file_path = 'files/alive.csv'
+    if not path.exists(directory):
+        mkdir(directory)
+
+    file_path = f'{directory}/alive.csv'
     if (round_number == 0) and (path.exists(file_path)):
         remove(file_path)
 
