@@ -1,5 +1,6 @@
 '''Main application'''
 import argparse
+import configparser
 from animals import Sheep, Wolf
 from argument_parser import IntRange
 from info_functions import display_info, save_to_json, save_to_csv
@@ -7,6 +8,8 @@ from info_functions import display_info, save_to_json, save_to_csv
 
 parser = argparse.ArgumentParser()
 
+parser.add_argument('-c', '--config', help='auxiliary configuration file', metavar='FILE',
+                    default='config.cnf')
 parser.add_argument('-r', '--rounds', help='numer of rounds', metavar='NUM',
                     type=IntRange(1), default=20)
 parser.add_argument('-s', '--sheep', help='numer of sheep in flock', metavar='NUM',
@@ -15,12 +18,18 @@ parser.add_argument('-w', '--wait', help='wait for input after every round', act
 
 args = parser.parse_args()
 
+config = configparser.ConfigParser()
+if config.read(args.config) is None:
+    raise argparse.ArgumentTypeError(f'{args.config} is not a config file')
+
+
+config.read(args.config)
 WAIT = args.wait
 MAX_ROUND_NUMBER = args.rounds
 SHEEP_FLOCK_SIZE = args.sheep
-INIT_POS_LIMIT = 10.0
-SHEEP_MOVE_DIST = 0.5
-WOLF_MOVE_DIST = 1.0
+INIT_POS_LIMIT = config.getfloat('Terrain', 'InitPosLimit', fallback=10)
+SHEEP_MOVE_DIST = config.getfloat('Movement', 'SheepMoveDist', fallback=0.5)
+WOLF_MOVE_DIST = config.getfloat('Movement', 'WolfMoveDist', fallback=1)
 
 
 def start_simulation():
