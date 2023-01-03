@@ -3,15 +3,14 @@ import argparse
 import configparser
 import logging
 from os import path
-from animals import Sheep, Wolf
-from argument_parser import IntRange
-from info_functions import display_info, save_to_json, save_to_csv
+from chase.models.animals import Sheep, Wolf
+from chase.helpers.argument_parser import IntRange
+from chase.helpers.info_functions import display_info, save_to_json, save_to_csv
 
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('-c', '--config', help='auxiliary configuration file', metavar='FILE',
-                    default='config.cnf')
+parser.add_argument('-c', '--config', help='auxiliary configuration file', metavar='FILE')
 parser.add_argument('-d', '--dir', help='subdirectory where report files will be placed',
                     default='.')
 parser.add_argument('-l', '--log', help='logging level', metavar='LEVEL',
@@ -24,20 +23,31 @@ parser.add_argument('-w', '--wait', help='wait for input after every round', act
 
 args = parser.parse_args()
 
-logging.basicConfig(filename='chase.log', level=args.log,
-                    format='[%(levelname)s] %(asctime)s - %(message)s')
+if args.log:
+    logging.basicConfig(filename='./chase.log', level=args.log,
+                        format='[%(levelname)s] %(asctime)s - %(message)s')
 
-config = configparser.ConfigParser()
-if not path.exists(args.config):
-    raise argparse.ArgumentTypeError(f'{args.config} is not a config file')
+if args.config:
+    config = configparser.ConfigParser()
+    if not path.exists(args.config):
+        logging.error('Config file not found')
+        raise argparse.ArgumentTypeError(f'{args.config} is not a config file')
 
-config.read(args.config)
+    config.read(args.config)
+    INIT_POS_LIMIT = config.getfloat('Terrain', 'InitPosLimit', fallback=10)
+    SHEEP_MOVE_DIST = config.getfloat('Movement', 'SheepMoveDist', fallback=0.5)
+    WOLF_MOVE_DIST = config.getfloat('Movement', 'WolfMoveDist', fallback=1)
+
+else:
+    INIT_POS_LIMIT = 10
+    SHEEP_MOVE_DIST = 0.5
+    WOLF_MOVE_DIST = 1
+
+
 WAIT = args.wait
 MAX_ROUND_NUMBER = args.rounds
 SHEEP_FLOCK_SIZE = args.sheep
-INIT_POS_LIMIT = config.getfloat('Terrain', 'InitPosLimit', fallback=10)
-SHEEP_MOVE_DIST = config.getfloat('Movement', 'SheepMoveDist', fallback=0.5)
-WOLF_MOVE_DIST = config.getfloat('Movement', 'WolfMoveDist', fallback=1)
+
 
 
 def start_simulation():
