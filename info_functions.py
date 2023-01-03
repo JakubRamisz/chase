@@ -1,10 +1,12 @@
 import csv
 import json
+import logging
 from os import remove, mkdir, path
 
 
 def display_info(flock, wolf, round_number):
     '''Prints information about current state of simulation'''
+    logging.debug('display_info() call ')
     formatted_wolf_pos = [ round(coordinate, 3) for coordinate in wolf.pos ]
     if wolf.prey:
         chased_sheep_info = f'The wolf is currently chasing sheep {flock.index(wolf.prey) + 1}\n'
@@ -24,6 +26,7 @@ def display_info(flock, wolf, round_number):
 
 def save_to_json(flock, wolf, round_number, directory):
     '''Saves information about animal positions to pos.json file'''
+    logging.debug('save_to_json() call')
     if not path.exists(directory):
         mkdir(directory)
 
@@ -40,6 +43,7 @@ def save_to_json(flock, wolf, round_number, directory):
 
 def save_to_csv(flock, round_number, directory):
     '''Saves information about alive sheep to alive.csv file'''
+    logging.debug('save_to_csv() call')
     if not path.exists(directory):
         mkdir(directory)
 
