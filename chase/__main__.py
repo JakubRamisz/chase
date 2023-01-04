@@ -59,6 +59,9 @@ def start_simulation():
     flock = [Sheep(INIT_POS_LIMIT, SHEEP_MOVE_DIST) for i in range(SHEEP_FLOCK_SIZE)]
     logging.info('setting initial positions of the wolf')
     wolf = Wolf(WOLF_MOVE_DIST)
+
+    pos_array = []
+
     for round_number in range(MAX_ROUND_NUMBER):
         alive_sheep = [sheep for sheep in flock if sheep.alive]
         if len(alive_sheep) > 0:
@@ -71,17 +74,22 @@ def start_simulation():
             logging.info('displaying round information')
             display_info(flock, wolf, round_number)
             logging.info('saving round information')
-            save_to_json(flock, wolf, round_number, args.dir)
+            sheep_pos_list = [sheep.pos for sheep in flock]
+            pos_array.append({'round_no': round_number + 1,
+                    'wolf_pos': wolf.pos,
+                    'sheep_pos': sheep_pos_list})
             save_to_csv(flock, round_number, args.dir)
 
             if WAIT:
                 logging.info('waiting for input')
                 input()
         else:
+            save_to_json(pos_array, args.dir)
             print("All the sheep were eaten")
             logging.info('end of simulation')
             return
 
+    save_to_json(pos_array, args.dir)
     logging.info('end of simulation')
 
 

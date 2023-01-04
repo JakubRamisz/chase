@@ -24,21 +24,18 @@ def display_info(flock, wolf, round_number):
             + f'{len([sheep for sheep in flock if sheep.alive])} sheep left alive\n')
 
 
-def save_to_json(flock, wolf, round_number, directory):
+def save_to_json(array, directory):
     '''Saves information about animal positions to pos.json file'''
     logging.debug('save_to_json() call')
     if not path.exists(directory):
         mkdir(directory)
 
     file_path = f'{directory}/pos.json'
-    if (round_number == 0) and (path.exists(file_path)):
+    if path.exists(file_path):
         remove(file_path)
 
-    sheep_pos_list = [sheep.pos for sheep in flock]
     with open(file_path, 'a', encoding='UTF-8') as json_file:
-        json_file.write(json.dumps({'round_no': round_number + 1,
-                    'wolf_pos': wolf.pos,
-                    'sheep_pos': sheep_pos_list}, indent=4))
+        json_file.write(json.dumps(array, indent=4))
 
 
 def save_to_csv(flock, round_number, directory):
